@@ -9,6 +9,7 @@ import { Usuario } from '../models/usuario.model'
 
 import { RegisterForm } from '../interfaces/register-form.interface';
 import { LoginForm } from '../interfaces/login-form.interface';
+import { CargarUsuario } from '../interfaces/cargar-usuarios.interface';
 
 const base_url = environment.base_url;
 
@@ -35,6 +36,14 @@ export class UsuarioService {
 
   get uid(): string{
     return this.usuario.uid;
+  }
+
+  get headers(){
+    return {
+      headers: {
+        'x-token': this.token
+      } 
+    }
   }
 
 
@@ -97,18 +106,11 @@ export class UsuarioService {
   }
 
   actualizarPerfil(data: { email: string, nombre: string,  role: string }){
-
     data = {
       ...data,
-      role: this.usuario.role 
-    };
-    console.log(`${base_url}/usuarios/${this.uid}`);
-    return this.http.put(`${base_url}/usuarios/${this.uid}`, data, {
-      headers: {
-        'x-token': this.token
-      }
-    });
-
+      role: this.usuario.role
+    }
+    return this.http.put(`${base_url}/usuarios/${this.uid}`, data, this.headers);
   }
 
   login( formData: LoginForm ) {
@@ -133,6 +135,30 @@ export class UsuarioService {
 
   }
 
-  
+  cargarUsuarios(desde: number): Observable<CargarUsuario>{
+    const url = `${base_url}/usuarios?desde=${desde}`;
+    return this.http.get<CargarUsuario>(url, this.headers)
+                .pipe(
+                  map(resp => {
+                    const usuarios = resp.usuarios.map(
+                      user => new Usuario(user.nombre, user.email, '', user.img, user.google, user.role, user.uid)
+                    );
+                    return {
+                      total: resp.total,
+                      usuarios
+                    };
+                  })
+                  )
+  }
 
+  eliminarUsuario(usuario:Usuario){
+    //http://localhost:3000/api/usuarios/646d0ecb3b3a6e8896a90293
+    const url = `${base_url}/usuarios/${usuario.uid}`;
+    return this.http.delete(url, this.headers);
+    console.log('Eliminando desde el servicio');
+  }
+
+  guardarUsuario(usuario: Usuario){
+    return this.http.put(`${base_url}/usuarios/${usuario.uid}`, usuario, this.headers);
+  }
 }
