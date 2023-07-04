@@ -19,7 +19,6 @@ export class Usuario {
         if(!this.img){
             return `${base_url}/upload/usuarios/no-image`;
         }
-
         else if(this.img.includes('https')){
             return this.img;
         }
@@ -29,8 +28,7 @@ export class Usuario {
         }
         else{
             return `${base_url}/upload/usuarios/no-image`;
-        }
-        
+        }       
     }
 
 }

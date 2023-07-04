@@ -30,7 +30,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     this.cargarUsuarios();
 
     this.imgSubs = this.modalImagenService.nuevaImagen
-            .pipe(delay(150))
+            .pipe(delay(1500))
             .subscribe(img => this.cargarUsuarios());
   }
 
